@@ -157,15 +157,25 @@ class StudyClockLogic:
             self.start()
 
     def reset_all(self):
+        # --- Laufzustand ---
         self.s.running = False
         self.s.mode = "focus"
         self.s.remaining = self.s.focus_min * 60
         self.s.completed_units = 0
         self.s.finished = False
+
+        # --- Microbreak ---
         self.s.microbreak_active = False
         self.s.microbreak_remaining = 0
         self.s.after_micro = ""
         self.s.reminded_this_focus.clear()
+
+        # --- Statistiken RESET ---
+        self.s.total_open_sec = 0
+        self.s.paused_sec = 0
+        self.s.microbreak_sec = 0
+        self.s.focus_work_sec = 0
+
         self._on_change()
 
     def skip_phase(self):
