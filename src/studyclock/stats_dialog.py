@@ -6,7 +6,10 @@ from .util import format_hm
 
 
 class StatsDialog(QDialog):
-    def __init__(self, parent, focus_work_sec: int, paused_sec: int, microbreak_sec: int, total_open_sec: int):
+    def __init__(
+        self, parent, focus_work_sec: int, paused_sec: int,
+        microbreak_sec: int, total_open_sec: int
+        ):
         super().__init__(parent)
         self.setWindowTitle("Statistiken")
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)

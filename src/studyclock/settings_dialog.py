@@ -1,11 +1,14 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import (
     QDialog, QDialogButtonBox, QFormLayout, QSpinBox, QVBoxLayout
-)
+    )
 
 
 class SettingsDialog(QDialog):
-    def __init__(self, parent, focus_min: int, break_min: int, micro_sec: int, goal: int, start_unit: int):
+    def __init__(
+        self, parent, focus_min: int, break_min: int, micro_sec: int,
+        goal: int, start_unit: int
+        ):
         super().__init__(parent)
 
         self.setWindowTitle("Settings")
@@ -38,7 +41,9 @@ class SettingsDialog(QDialog):
         form.addRow("Ziel-Einheiten", self.goal)
         form.addRow("Start-Einheit", self.start_units)
 
-        buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
+        buttons = QDialogButtonBox(
+            QDialogButtonBox.Ok | QDialogButtonBox.Cancel
+            )
         buttons.accepted.connect(self.accept)
         buttons.rejected.connect(self.reject)
 
@@ -54,4 +59,4 @@ class SettingsDialog(QDialog):
             self.micro.value(),
             self.goal.value(),
             self.start_units.value(),
-        )
+            )

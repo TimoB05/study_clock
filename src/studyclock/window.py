@@ -1,16 +1,18 @@
 from __future__ import annotations
 
-from PySide6.QtCore import QPoint, QSettings, Qt, QTimer, QSize
+from PySide6.QtCore import QPoint, QSettings, QSize, Qt, QTimer
 from PySide6.QtGui import QAction, QFont, QIcon
 from PySide6.QtWidgets import (
-    QWidget, QLabel, QPushButton, QVBoxLayout, QHBoxLayout,
-    QSystemTrayIcon, QMenu, QApplication, QStyle
-)
+    QApplication, QHBoxLayout, QLabel, QMenu, QPushButton, QStyle,
+    QSystemTrayIcon, QVBoxLayout, QWidget
+    )
 
 from .logic import ClockState, StudyClockLogic
 from .settings_dialog import SettingsDialog
-from .stats_dialog import StatsDialog  # falls deine Datei stas_dialog.py heißt: from .stas_dialog import StatsDialog
-from .util import format_time_mmss, format_hm, tint_icon, beep
+from .stats_dialog import \
+    StatsDialog  # falls deine Datei stas_dialog.py heißt: from .stas_dialog
+# import StatsDialog
+from .util import beep, format_hm, format_time_mmss, tint_icon
 
 
 class StudyClockWindow(QWidget):
@@ -28,7 +30,12 @@ class StudyClockWindow(QWidget):
 
         # ---------- Load runtime state ----------
         mode = self.qs.value("mode", "focus")
-        remaining = int(self.qs.value("remaining", focus_min * 60 if mode == "focus" else break_min * 60))
+        remaining = int(
+            self.qs.value(
+                "remaining",
+                focus_min * 60 if mode == "focus" else break_min * 60
+                )
+            )
 
         completed_units = int(self.qs.value("completed_units", 0))
         microbreak_active = bool(int(self.qs.value("microbreak_active", 0)))
@@ -59,32 +66,38 @@ class StudyClockWindow(QWidget):
             paused_sec=paused_sec,
             microbreak_sec=microbreak_sec,
             focus_work_sec=focus_work_sec,
-        )
+            )
 
-        self.logic = StudyClockLogic(state=state, on_change=self.update_ui, on_beep=beep)
+        self.logic = StudyClockLogic(
+            state=state, on_change=self.update_ui, on_beep=beep
+            )
 
         # ---------- Window flags / style ----------
-        self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool)
+        self.setWindowFlags(
+            Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint | Qt.Tool
+            )
         self.setAttribute(Qt.WA_TranslucentBackground, True)
 
         self.wrapper = QWidget(self)
         self.wrapper.setObjectName("wrapper")
-        self.wrapper.setStyleSheet("""
-            QWidget#wrapper {
-                background: #111;
-                border: 1px solid #333;
-                border-radius: 14px;
-            }
-            QLabel { color: #eee; }
-            QPushButton {
-                background: transparent;
-                color: #eee;
-                border: none;
-                padding: 2px 6px;
-                border-radius: 6px;
-            }
-            QPushButton:hover { background: #222; }
-        """)
+        self.wrapper.setStyleSheet(
+            """
+                        QWidget#wrapper {
+                            background: #111;
+                            border: 1px solid #333;
+                            border-radius: 14px;
+                        }
+                        QLabel { color: #eee; }
+                        QPushButton {
+                            background: transparent;
+                            color: #eee;
+                            border: none;
+                            padding: 2px 6px;
+                            border-radius: 6px;
+                        }
+                        QPushButton:hover { background: #222; }
+                    """
+            )
 
         # ---------- Tray ----------
         self.tray = QSystemTrayIcon(QIcon())
@@ -154,25 +167,37 @@ class StudyClockWindow(QWidget):
         self.skip_btn = QPushButton()
         self.reset_btn = QPushButton()
 
-        self.play_pause_btn.setIcon(tint_icon(self.style().standardIcon(QStyle.SP_MediaPlay)))
-        self.rewind_btn.setIcon(tint_icon(self.style().standardIcon(QStyle.SP_MediaSeekBackward)))
-        self.skip_btn.setIcon(tint_icon(self.style().standardIcon(QStyle.SP_MediaSeekForward)))
+        self.play_pause_btn.setIcon(
+            tint_icon(self.style().standardIcon(QStyle.SP_MediaPlay))
+            )
+        self.rewind_btn.setIcon(
+            tint_icon(self.style().standardIcon(QStyle.SP_MediaSeekBackward))
+            )
+        self.skip_btn.setIcon(
+            tint_icon(self.style().standardIcon(QStyle.SP_MediaSeekForward))
+            )
         self.reset_btn.setText("⟲")
         self.reset_btn.setFont(QFont("Segoe UI", 12, QFont.Bold))
 
-        for b in (self.play_pause_btn, self.rewind_btn, self.skip_btn, self.reset_btn):
+        for b in (
+                self.play_pause_btn, self.rewind_btn, self.skip_btn,
+                self.reset_btn
+        ):
             b.setIconSize(QSize(18, 18))
             b.setFixedSize(44, 32)
-            b.setStyleSheet("""
-                QPushButton {
-                    background: #262626;
-                    border: 1px solid #3a3a3a;
-                    border-radius: 10px;
-                    color: white;
-                }
-                QPushButton:hover { background: #2f2f2f; border: 1px solid #4a4a4a; }
-                QPushButton:pressed { background: #1f1f1f; }
-            """)
+            b.setStyleSheet(
+                """
+                                QPushButton {
+                                    background: #262626;
+                                    border: 1px solid #3a3a3a;
+                                    border-radius: 10px;
+                                    color: white;
+                                }
+                                QPushButton:hover { background: #2f2f2f; 
+                                border: 1px solid #4a4a4a; }
+                                QPushButton:pressed { background: #1f1f1f; }
+                            """
+                )
 
         self.play_pause_btn.setToolTip("Start / Pause")
         self.rewind_btn.setToolTip("Zurück (Phase)")
@@ -246,8 +271,12 @@ class StudyClockWindow(QWidget):
 
         # progress
         done, left, total, pct = self.logic.calc_focus_progress()
-        self.studytime_label.setText(f"{format_hm(done)}/{format_hm(total)} ({pct}%)")
-        self.counter_label.setText(f"Einheit: {self.logic.current_unit()}/{s.session_goal}")
+        self.studytime_label.setText(
+            f"{format_hm(done)}/{format_hm(total)} ({pct}%)"
+            )
+        self.counter_label.setText(
+            f"Einheit: {self.logic.current_unit()}/{s.session_goal}"
+            )
 
         # finished
         if s.finished:
@@ -255,7 +284,9 @@ class StudyClockWindow(QWidget):
             self.mode_label.setStyleSheet("color: #7CFC98;")
             self.timer_label.setText("FERTIG")
             self.timer_label.setStyleSheet("color: #7CFC98;")
-            self.play_pause_btn.setIcon(tint_icon(self.style().standardIcon(QStyle.SP_MediaPlay)))
+            self.play_pause_btn.setIcon(
+                tint_icon(self.style().standardIcon(QStyle.SP_MediaPlay))
+                )
             if self.tick_timer.isActive():
                 self.tick_timer.stop()
             return
@@ -268,7 +299,9 @@ class StudyClockWindow(QWidget):
             self.mode_label.setText("PAUSIERT")
             self.mode_label.setStyleSheet("color: #ff6b6b;")
             self.timer_label.setStyleSheet("color: #ff6b6b;")
-            self.play_pause_btn.setIcon(tint_icon(self.style().standardIcon(QStyle.SP_MediaPlay)))
+            self.play_pause_btn.setIcon(
+                tint_icon(self.style().standardIcon(QStyle.SP_MediaPlay))
+                )
             if self.tick_timer.isActive():
                 self.tick_timer.stop()
         else:
@@ -283,14 +316,17 @@ class StudyClockWindow(QWidget):
                 self.timer_label.setStyleSheet("color: #7CC7FF;")
 
             self.mode_label.setStyleSheet("color: #888;")
-            self.play_pause_btn.setIcon(tint_icon(self.style().standardIcon(QStyle.SP_MediaPause)))
+            self.play_pause_btn.setIcon(
+                tint_icon(self.style().standardIcon(QStyle.SP_MediaPause))
+                )
             if not self.tick_timer.isActive():
                 self.tick_timer.start()
 
     # ---------- Button handlers ----------
     def on_toggle_play_pause(self):
         self.logic.toggle_play_pause()
-        # update_ui wird via on_change schon gerufen, aber hier ist ok redundant:
+        # update_ui wird via on_change schon gerufen, aber hier ist ok
+        # redundant:
         self.update_ui()
 
     def on_reset(self):
@@ -311,10 +347,12 @@ class StudyClockWindow(QWidget):
             s.micro_sec,
             s.session_goal,
             self.logic.current_unit(),
-        )
+            )
         if dlg.exec() == dlg.Accepted:
             focus_min, break_min, micro_sec, goal, start_unit = dlg.values()
-            self.logic.apply_settings(focus_min, break_min, micro_sec, goal, start_unit)
+            self.logic.apply_settings(
+                focus_min, break_min, micro_sec, goal, start_unit
+                )
 
             # persist config immediately
             self.qs.setValue("focus_min", self.logic.s.focus_min)
@@ -333,7 +371,7 @@ class StudyClockWindow(QWidget):
             paused_sec=s.paused_sec,
             microbreak_sec=s.microbreak_sec,
             total_open_sec=s.total_open_sec,
-        )
+            )
         dlg.exec()
 
     # ---------- Tray ----------
@@ -366,7 +404,8 @@ class StudyClockWindow(QWidget):
     def mousePressEvent(self, event):
         if event.button() == Qt.LeftButton:
             self._dragging = True
-            self._drag_offset = event.globalPosition().toPoint() - self.frameGeometry().topLeft()
+            self._drag_offset = (event.globalPosition().toPoint() -
+                                 self.frameGeometry().topLeft())
             event.accept()
 
     def mouseMoveEvent(self, event):

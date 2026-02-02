@@ -21,7 +21,9 @@ def beep():
     QApplication.beep()
 
 
-def tint_icon(icon: QIcon, size: int = 18, color: QColor = QColor("white")) -> QIcon:
+def tint_icon(
+    icon: QIcon, size: int = 18, color: QColor = QColor("white")
+    ) -> QIcon:
     pm = icon.pixmap(size, size)
     if pm.isNull():
         return icon
