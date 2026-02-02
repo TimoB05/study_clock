@@ -1,14 +1,17 @@
-# Code of Conduct
+# Security Policy
 
-This project follows a simple rule:
+## Supported Versions
+Only the latest version of StudyClock is supported.
 
-**Be respectful and constructive.**
+## Reporting a Vulnerability
+If you discover a security issue either:
 
-Unacceptable behavior includes:
-- Harassment or discrimination
-- Personal attacks
-- Aggressive or dismissive language
+- Open a public issue
+- Contact the maintainer directly via GitHub
 
-Project maintainers may remove contributions that violate this principle.
+Please include:
+- Description of the issue
+- Steps to reproduce
+- Potential impact
 
-This project aims to be calm, focused, and respectful.
+Security issues will be handled as quickly as possible.
