@@ -94,7 +94,7 @@ class StudyClockLogic:
         self.s.running = True
         self._on_change()
 
-    # ---------- Microbreak ----------
+    # ---------- microbreak ----------
     def start_microbreak(self, after_micro: str):
         # kein Text – nur interner Timer + beep
         if self.s.micro_sec <= 0:
