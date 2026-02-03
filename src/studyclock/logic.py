@@ -110,9 +110,11 @@ class StudyClockLogic:
             return
 
         self.s.microbreak_active = True
+        self._on_change()
         self.s.microbreak_remaining = self.s.micro_sec
         self.s.after_micro = after_micro
         self._beep()
+        self._on_change()
 
     def end_microbreak(self):
         self.s.microbreak_active = False
@@ -245,8 +247,12 @@ class StudyClockLogic:
         if self.s.microbreak_active:
             self.s.microbreak_sec += 1
             self.s.microbreak_remaining -= 1
+
             if self.s.microbreak_remaining <= 0:
-                self.end_microbreak()
+                self.end_microbreak()  # calls _on_change() already
+                return
+
+            self._on_change()  # update UI each second during screen break
             return
 
         # Focus-Stats
@@ -264,7 +270,6 @@ class StudyClockLogic:
 
             if self.s.remaining in (40 * 60, 20 * 60):
                 self.start_microbreak(after_micro="resume_focus")
-                self._on_change()
                 return
 
             if self.s.remaining == 0:
@@ -290,7 +295,7 @@ class StudyClockLogic:
                 self._on_change()
                 return
 
-    self._on_change()
+        self._on_change()
 
     def on_pause_count_tick(self):
         """Called once per second (always), counts ‘user paused’."""

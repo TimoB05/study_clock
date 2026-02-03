@@ -292,9 +292,10 @@ class StudyClockWindow(QWidget):
 
         # microbreak display (optional)
         if s.microbreak_active:
-            self.mode_label.setText("SCREEN")
+            self.mode_label.setText("SCREEN BREAK")
             self.mode_label.setStyleSheet("color: #888;")
-            self.timer_label.setText(format_time_mmss(s.microbreak_remaining))
+            self.timer_label.setText(
+                format_time_mmss(max(1, s.microbreak_remaining)))
             self.timer_label.setStyleSheet("color: #FFD27C;")  # warm/yellow
             self.play_pause_btn.setIcon(
                 tint_icon(self.style().standardIcon(QStyle.SP_MediaPause))
@@ -308,7 +309,7 @@ class StudyClockWindow(QWidget):
 
         # running visuals
         if not s.running:
-            self.mode_label.setText("Paused")
+            self.mode_label.setText("PAUSED")
             self.mode_label.setStyleSheet("color: #ff6b6b;")
             self.timer_label.setStyleSheet("color: #ff6b6b;")
             self.play_pause_btn.setIcon(
