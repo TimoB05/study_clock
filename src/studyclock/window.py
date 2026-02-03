@@ -10,8 +10,7 @@ from PySide6.QtWidgets import (
 from .logic import ClockState, StudyClockLogic
 from .settings_dialog import SettingsDialog
 from .stats_dialog import \
-    StatsDialog  # falls deine Datei stas_dialog.py heißt: from .stas_dialog
-# import StatsDialog
+    StatsDialog
 from .util import beep, format_hm, format_time_mmss, tint_icon
 
 
@@ -103,8 +102,8 @@ class StudyClockWindow(QWidget):
         self.tray = QSystemTrayIcon(QIcon())
         menu = QMenu()
 
-        restore_action = QAction("Öffnen")
-        quit_action = QAction("Beenden")
+        restore_action = QAction("Open")
+        quit_action = QAction("End")
         restore_action.triggered.connect(self.showNormal)
         quit_action.triggered.connect(QApplication.quit)
 
@@ -119,7 +118,7 @@ class StudyClockWindow(QWidget):
         self.btn_settings = QPushButton("⚙")
         self.btn_stats = QPushButton("📊")
         self.btn_lunch = QPushButton("L")
-        self.btn_lunch.setToolTip("Mittagspause (60 Min)")
+        self.btn_lunch.setToolTip("Lunch Break (60 Min)")
 
         self.btn_min = QPushButton("—")
         self.btn_close = QPushButton("×")
@@ -154,7 +153,7 @@ class StudyClockWindow(QWidget):
         self.counter_label.setFont(QFont("Segoe UI", 10))
         self.counter_label.setAlignment(Qt.AlignCenter)
 
-        # (Info-Label bleibt optional, aber standardmäßig unsichtbar)
+        # (Info label remains optional, but invisible by default)
         self.info_label = QLabel("")
         self.info_label.setFont(QFont("Segoe UI", 9))
         self.info_label.setAlignment(Qt.AlignCenter)
@@ -200,8 +199,8 @@ class StudyClockWindow(QWidget):
                 )
 
         self.play_pause_btn.setToolTip("Start / Pause")
-        self.rewind_btn.setToolTip("Zurück (Phase)")
-        self.skip_btn.setToolTip("Vor (Phase)")
+        self.rewind_btn.setToolTip("Back (Phase)")
+        self.skip_btn.setToolTip("Skip (Phase)")
         self.reset_btn.setToolTip("Reset")
 
         ctrl_row = QHBoxLayout()
@@ -275,14 +274,14 @@ class StudyClockWindow(QWidget):
             f"{format_hm(done)}/{format_hm(total)} ({pct}%)"
             )
         self.counter_label.setText(
-            f"Einheit: {self.logic.current_unit()}/{s.session_goal}"
+            f"Unit: {self.logic.current_unit()}/{s.session_goal}"
             )
 
         # finished
         if s.finished:
-            self.mode_label.setText("FERTIG")
+            self.mode_label.setText("Finished")
             self.mode_label.setStyleSheet("color: #7CFC98;")
-            self.timer_label.setText("FERTIG")
+            self.timer_label.setText("Finished")
             self.timer_label.setStyleSheet("color: #7CFC98;")
             self.play_pause_btn.setIcon(
                 tint_icon(self.style().standardIcon(QStyle.SP_MediaPlay))
@@ -296,7 +295,7 @@ class StudyClockWindow(QWidget):
 
         # running visuals
         if not s.running:
-            self.mode_label.setText("PAUSIERT")
+            self.mode_label.setText("Paused")
             self.mode_label.setStyleSheet("color: #ff6b6b;")
             self.timer_label.setStyleSheet("color: #ff6b6b;")
             self.play_pause_btn.setIcon(
@@ -306,13 +305,13 @@ class StudyClockWindow(QWidget):
                 self.tick_timer.stop()
         else:
             if s.mode == "focus":
-                self.mode_label.setText("FOKUS")
+                self.mode_label.setText("FOCUS")
                 self.timer_label.setStyleSheet("color: #7CFC98;")
             elif s.mode == "break":
                 self.mode_label.setText("PAUSE")
                 self.timer_label.setStyleSheet("color: #7CC7FF;")
             else:
-                self.mode_label.setText("MITTAG")
+                self.mode_label.setText("LUNCH")
                 self.timer_label.setStyleSheet("color: #7CC7FF;")
 
             self.mode_label.setStyleSheet("color: #888;")
@@ -325,7 +324,7 @@ class StudyClockWindow(QWidget):
     # ---------- Button handlers ----------
     def on_toggle_play_pause(self):
         self.logic.toggle_play_pause()
-        # update_ui wird via on_change schon gerufen, aber hier ist ok
+        # update_ui is already called via on_change, but it's okay here.
         # redundant:
         self.update_ui()
 

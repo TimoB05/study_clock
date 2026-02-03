@@ -96,7 +96,7 @@ class StudyClockLogic:
 
     # ---------- microbreak ----------
     def start_microbreak(self, after_micro: str):
-        # kein Text – nur interner Timer + beep
+        # mo text, only internal timer + beep
         if self.s.micro_sec <= 0:
             self.s.after_micro = after_micro
             self.end_microbreak()
@@ -123,7 +123,7 @@ class StudyClockLogic:
 
     # ---------- Completion ----------
     def finish_focus_unit(self, use_microbreak_before_break: bool = True):
-        # Einheit SOFORT abschließen
+        # finish unit
         self.s.completed_units += 1
 
         if self.s.completed_units >= self.s.session_goal:
@@ -131,7 +131,7 @@ class StudyClockLogic:
             self._on_change()
             return
 
-        # nach Fokus: optional microbreak, dann Pause
+        # after focus: microbreak and break
         if use_microbreak_before_break:
             self.start_microbreak(after_micro="go_break")
         else:
@@ -157,7 +157,7 @@ class StudyClockLogic:
             self.start()
 
     def reset_all(self):
-        # --- Laufzustand ---
+        # --- running condition ---
         self.s.running = False
         self.s.mode = "focus"
         self.s.remaining = self.s.focus_min * 60
@@ -170,7 +170,7 @@ class StudyClockLogic:
         self.s.after_micro = ""
         self.s.reminded_this_focus.clear()
 
-        # --- Statistiken RESET ---
+        # --- Statistics RESET ---
         self.s.total_open_sec = 0
         self.s.paused_sec = 0
         self.s.microbreak_sec = 0
@@ -182,17 +182,17 @@ class StudyClockLogic:
         if self.s.finished:
             return
 
-        # Microbreak: skip = beenden
+        # Microbreak: skip = terminate
         if self.s.microbreak_active:
             self.end_microbreak()
             return
 
         if self.s.mode == "focus":
-            # MANUELLER SKIP: direkt Pause, kein Microbreak
+            # MANUAL SKIP: direct pause, no microbreak
             self.finish_focus_unit(use_microbreak_before_break=False)
             return
 
-        # break/lunch -> fokus
+        # break/lunch -> focus
         self.switch_to_focus()
         self._on_change()
 
@@ -200,7 +200,7 @@ class StudyClockLogic:
         if self.s.finished:
             return
 
-        # Microbreak: zurück = abbrechen, weiter in Phase
+        # Microbreak: back = cancel, continue in phase
         if self.s.microbreak_active:
             self.s.microbreak_active = False
             self.s.microbreak_remaining = 0
@@ -208,8 +208,7 @@ class StudyClockLogic:
             self._on_change()
             return
 
-        # Wenn noch keine Einheit abgeschlossen und Fokus: kein Wechsel in
-        # Pause
+        # If no unit has been completed yet and focus: no change into Pause
         if self.s.completed_units == 0 and self.s.mode == "focus":
             self.s.remaining = self.s.focus_min * 60
             self._on_change()
@@ -228,8 +227,8 @@ class StudyClockLogic:
 
     # ---------- Tick handlers ----------
     def on_tick(self):
-        """Wird 1x pro Sekunde aufgerufen, aber nur wenn running==True (
-        Fenster startet/stoppt den QTimer)."""
+        """Called once per second, but only if running==True (window
+        starts/stops the QTimer)."""
         if self.s.finished or (not self.s.running):
             return
 
@@ -243,14 +242,14 @@ class StudyClockLogic:
                 self.end_microbreak()
             return
 
-        # Fokus-Stats
+        # Focus-Stats
         if self.s.mode == "focus":
             self.s.focus_work_sec += 1
 
         # normal countdown
         self.s.remaining -= 1
 
-        # Reminder im Fokus
+        # Reminder in Focus
         if (self.s.mode == "focus"
                 and self.s.remaining in self.s.remind_at
                 and self.s.remaining not in self.s.reminded_this_focus):
@@ -261,12 +260,12 @@ class StudyClockLogic:
                 return
 
             if self.s.remaining == 0:
-                # Fokus endet: Einheit sofort abschließen (mit Microbreak,
-                # dann Pause)
+                # Focus ends: Complete unit immediately (with microbreak,
+                # then break)
                 self.finish_focus_unit()
                 return
 
-        # Phase Ende ohne Reminder-Zweig
+        # Phase end without reminder branch
         if self.s.remaining <= 0:
             if self.s.mode == "focus":
                 self.finish_focus_unit()
@@ -278,7 +277,7 @@ class StudyClockLogic:
         self._on_change()
 
     def on_pause_count_tick(self):
-        """Wird 1x pro Sekunde aufgerufen (immer), zählt 'user paused'."""
+        """Called once per second (always), counts ‘user paused’."""
         if (not self.s.running) and (not self.s.microbreak_active) and (
         not self.s.finished):
             self.s.paused_sec += 1
