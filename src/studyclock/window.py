@@ -3,7 +3,7 @@ from __future__ import annotations
 from PySide6.QtCore import QPoint, QSettings, QSize, Qt, QTimer
 from PySide6.QtGui import QAction, QFont, QIcon
 from PySide6.QtWidgets import (
-    QApplication, QHBoxLayout, QLabel, QMenu, QPushButton, QStyle,
+    QApplication, QDialog, QHBoxLayout, QLabel, QMenu, QPushButton, QStyle,
     QSystemTrayIcon, QVBoxLayout, QWidget
     )
 
@@ -181,7 +181,7 @@ class StudyClockWindow(QWidget):
         for b in (
                 self.play_pause_btn, self.rewind_btn, self.skip_btn,
                 self.reset_btn
-        ):
+                ):
             b.setIconSize(QSize(18, 18))
             b.setFixedSize(44, 32)
             b.setStyleSheet(
@@ -290,6 +290,19 @@ class StudyClockWindow(QWidget):
                 self.tick_timer.stop()
             return
 
+        # microbreak display (optional)
+        if s.microbreak_active:
+            self.mode_label.setText("SCREEN")
+            self.mode_label.setStyleSheet("color: #888;")
+            self.timer_label.setText(format_time_mmss(s.microbreak_remaining))
+            self.timer_label.setStyleSheet("color: #FFD27C;")  # warm/yellow
+            self.play_pause_btn.setIcon(
+                tint_icon(self.style().standardIcon(QStyle.SP_MediaPause))
+                )
+            if not self.tick_timer.isActive() and s.running:
+                self.tick_timer.start()
+            return
+
         # timer text
         self.timer_label.setText(format_time_mmss(s.remaining))
 
@@ -347,7 +360,7 @@ class StudyClockWindow(QWidget):
             s.session_goal,
             self.logic.current_unit(),
             )
-        if dlg.exec() == dlg.Accepted:
+        if dlg.exec() == QDialog.Accepted:
             focus_min, break_min, micro_sec, goal, start_unit = dlg.values()
             self.logic.apply_settings(
                 focus_min, break_min, micro_sec, goal, start_unit

@@ -1,8 +1,19 @@
+import os
 import sys
 
 from PySide6.QtWidgets import QApplication
 
-from .window import StudyClockWindow
+if __package__ is None or __package__ == "":
+    # Running as a script (e.g., PyInstaller)
+    sys.path.insert(
+        0, os.path.abspath(
+            os.path.join(os.path.dirname(__file__), "..")
+            )
+        )
+    from studyclock.window import StudyClockWindow
+else:
+    # Running as a package
+    from .window import StudyClockWindow
 
 
 def main():

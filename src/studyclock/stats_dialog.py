@@ -11,11 +11,14 @@ class StatsDialog(QDialog):
         microbreak_sec: int, total_open_sec: int
         ):
         super().__init__(parent)
-        self.setWindowTitle("statistics")
+        self.setWindowTitle("Statistics")
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
 
         total = max(1, int(total_open_sec))
-        eff = int(round((int(focus_work_sec) / total) * 100))
+        running = int(total_open_sec)  # only running if running==True
+        paused = int(paused_sec)  # manual pause
+        den = max(1, running + paused)
+        eff = int(round((running / den) * 100))
 
         text = (
             f"Focus Active: {format_hm(focus_work_sec)}\n"

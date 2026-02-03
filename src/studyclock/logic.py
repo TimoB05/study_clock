@@ -23,6 +23,9 @@ class ClockState:
     after_micro: str = ""  # resume_focus / go_break / go_focus
     finished: bool = False
     running: bool = False
+    pre_lunch_mode: str = "focus"
+    pre_lunch_remaining: int = 0
+    pre_lunch_was_running: bool = False
 
     reminded_this_focus: Set[int] = field(default_factory=set)
     remind_at: Set[int] = field(default_factory=lambda: set(DEFAULT_REMIND_AT))
@@ -86,6 +89,10 @@ class StudyClockLogic:
     def start_lunch_break(self):
         if self.s.finished:
             return
+        self.s.pre_lunch_mode = self.s.mode
+        self.s.pre_lunch_remaining = self.s.remaining
+        self.s.pre_lunch_was_running = self.s.running
+
         self.s.microbreak_active = False
         self.s.microbreak_remaining = 0
         self.s.after_micro = ""
@@ -96,7 +103,7 @@ class StudyClockLogic:
 
     # ---------- microbreak ----------
     def start_microbreak(self, after_micro: str):
-        # mo text, only internal timer + beep
+        # no text, only internal timer + beep
         if self.s.micro_sec <= 0:
             self.s.after_micro = after_micro
             self.end_microbreak()
@@ -257,6 +264,7 @@ class StudyClockLogic:
 
             if self.s.remaining in (40 * 60, 20 * 60):
                 self.start_microbreak(after_micro="resume_focus")
+                self._on_change()
                 return
 
             if self.s.remaining == 0:
@@ -270,16 +278,24 @@ class StudyClockLogic:
             if self.s.mode == "focus":
                 self.finish_focus_unit()
             else:
+                if self.s.mode == "lunch":
+                    # restore previous phase after lunch
+                    self.s.mode = self.s.pre_lunch_mode
+                    self.s.remaining = self.s.pre_lunch_remaining
+                    self.s.running = self.s.pre_lunch_was_running
+                    self._on_change()
+                    return
+
                 self.switch_to_focus()
                 self._on_change()
                 return
 
-        self._on_change()
+    self._on_change()
 
     def on_pause_count_tick(self):
         """Called once per second (always), counts ‘user paused’."""
         if (not self.s.running) and (not self.s.microbreak_active) and (
-        not self.s.finished):
+                not self.s.finished):
             self.s.paused_sec += 1
 
     # ---------- Settings apply ----------
@@ -298,7 +314,7 @@ class StudyClockLogic:
 
         if (not self.s.running) and (not self.s.microbreak_active):
             self.s.remaining = (
-                        self.s.focus_min * 60) if self.s.mode == "focus" else (
-                        self.s.break_min * 60)
+                    self.s.focus_min * 60) if self.s.mode == "focus" else (
+                    self.s.break_min * 60)
 
         self._on_change()
