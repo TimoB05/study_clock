@@ -23,7 +23,7 @@ class SettingsDialog(QDialog):
         self.brk.setValue(break_min)
 
         self.micro = QSpinBox()
-        self.micro.setRange(0, 600)  # 0 = microbreak deaktivieren
+        self.micro.setRange(0, 600)  # 0 = deactivate microbreak
         self.micro.setValue(micro_sec)
 
         self.goal = QSpinBox()
@@ -35,11 +35,11 @@ class SettingsDialog(QDialog):
         self.start_units.setValue(start_unit)
 
         form = QFormLayout()
-        form.addRow("Fokus (Min)", self.focus)
-        form.addRow("Pause (Min)", self.brk)
-        form.addRow("Bildschirmpause (Sek)", self.micro)
-        form.addRow("Ziel-Einheiten", self.goal)
-        form.addRow("Start-Einheit", self.start_units)
+        form.addRow("Focus (Min)", self.focus)
+        form.addRow("Break (Min)", self.brk)
+        form.addRow("Screen Break (Sec)", self.micro)
+        form.addRow("Target Units", self.goal)
+        form.addRow("Starting Unit", self.start_units)
 
         buttons = QDialogButtonBox(
             QDialogButtonBox.Ok | QDialogButtonBox.Cancel

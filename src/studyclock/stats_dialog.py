@@ -11,17 +11,17 @@ class StatsDialog(QDialog):
         microbreak_sec: int, total_open_sec: int
         ):
         super().__init__(parent)
-        self.setWindowTitle("Statistiken")
+        self.setWindowTitle("statistics")
         self.setWindowFlags(self.windowFlags() | Qt.WindowStaysOnTopHint)
 
         total = max(1, int(total_open_sec))
         eff = int(round((int(focus_work_sec) / total) * 100))
 
         text = (
-            f"Fokus aktiv: {format_hm(focus_work_sec)}\n"
-            f"Pausiert: {format_hm(paused_sec)}\n"
-            f"Bildschirmpause: {format_hm(microbreak_sec)}\n"
-            f"\nEffizienz: {eff}%"
+            f"Focus Active: {format_hm(focus_work_sec)}\n"
+            f"Paused: {format_hm(paused_sec)}\n"
+            f"Screen Break: {format_hm(microbreak_sec)}\n"
+            f"\nEfficiency: {eff}%"
         )
 
         lbl = QLabel(text)
